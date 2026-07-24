@@ -2,9 +2,9 @@
 
 ## 背景
 
-AppPurge 当前支持扫描 Android 工程中的 application module，并对已连接设备上的应用执行 reinstall、clear data、uninstall 等操作。
+APK Deck 当前支持扫描 Android 工程中的 application module，并对已连接设备上的应用执行 reinstall、clear data、uninstall 等操作。
 
-新增需求是在 Module APP 的 Options 列增加一个 Push 功能，用于将本地 APK 推送到设备 system 分区指定位置，覆盖或新增 system app，并在必要时处理 data overlay、清数据和重启生效提示。
+Push 功能位于 Module APP 的 Actions 区域，用于将本地 APK 推送到设备 system 分区指定位置，覆盖或新增 system app，并在必要时处理 data overlay、清数据和重启生效提示。
 
 ## 目标
 
@@ -20,9 +20,9 @@ AppPurge 当前支持扫描 Android 工程中的 application module，并对已�
 - 不持久化保存重启标记到磁盘，Android Studio 重启后标记可以丢失。
 - 不自动执行更侵入性的设备修复动作，例如自动 disable-verity；只提示用户重启后重试。
 
-## Options 入口
+## Actions 入口
 
-当前 Options:
+Actions:
 
 ```text
 Reinstall | Clear Data | Uninstall
@@ -259,7 +259,7 @@ else:
 Push System APK
 
 Package:
-com.lenovo.turboaim.leclawplus.agentserver
+dev.example.agentserver
 
 Local APK:
 [ agent-server/build/outputs/apk/debug/agent-server-debug.apk      folder-button ]
@@ -467,15 +467,15 @@ listDeviceDir(...)
 - 判断 `/data/app` overlay。
 - 封装 root/remount/push/chmod/chown/restorecon/sync。
 
-### UninstallTableModel.kt
+### AppInstallationTableModel.kt
 
-- Options 增加 `COL_PUSH`。
+- Actions 增加 `COL_PUSH`。
 - `COLUMNS` 增加一列。
 - editable/action 判断增加 Push。
 
-### UninstallDialog.kt
+### ApkDeckDialog.kt
 
-- Options 表头跨度从 3 列改为 4 列。
+- Actions 表头跨度从 3 列改为 4 列。
 - 增加 Push action renderer/editor。
 - 增加 Push 弹窗。
 - 增加设备路径选择器。
@@ -494,4 +494,4 @@ listDeviceDir(...)
 4. 增加 data overlay 移除和 clear data。
 5. 增加 push 成功后的 reboot pending 标记。
 6. 增加右上角 `Reboot Required` 按钮和 boot id 自动清理。
-7. 最后调整 Options 四列布局、图标和 tooltip。
+7. 最后调整 Actions 四列布局、图标和 tooltip。

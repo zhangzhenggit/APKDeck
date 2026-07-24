@@ -1,4 +1,4 @@
-package com.lenovo.tools.apppurge
+package dev.apkdeck
 
 import java.io.File
 import java.util.Properties
@@ -173,11 +173,11 @@ object AdbService {
         }
         val root = systemPartitionRootFromPath(targetPath)
             ?: return CommandResult(false, "Unable to resolve system partition for target: $targetPath")
-        val tempPath = "$root/.apppurge_write_check_${System.currentTimeMillis()}_${System.nanoTime()}"
+        val tempPath = "$root/.apkdeck_write_check_${System.currentTimeMillis()}_${System.nanoTime()}"
         val quotedTemp = shellQuote(tempPath)
         val result = shellResult(
             serial,
-            "tmp=$quotedTemp; echo apppurge > \"\$tmp\" && rm -f \"\$tmp\"",
+            "tmp=$quotedTemp; echo apkdeck > \"\$tmp\" && rm -f \"\$tmp\"",
             adb,
             timeoutSec = 10,
         )
@@ -244,7 +244,7 @@ object AdbService {
         if (!request.localApk.isFile || !request.localApk.canRead() || request.localApk.length() <= 0L) {
             return SystemPushResult(false, "validating local APK", "Local APK is missing, unreadable, or empty: ${request.localApk.absolutePath}")
         }
-        val tmpPath = "${request.targetPath}.apppurge.tmp"
+        val tmpPath = "${request.targetPath}.apkdeck.tmp"
 
         fun shellStep(step: String, command: String, timeoutSec: Long = 20): Pair<Boolean, String> {
             val result = shellResult(request.serial, command, request.adb, timeoutSec)
@@ -295,7 +295,7 @@ object AdbService {
                 try { process.inputStream.bufferedReader().use { output.append(it.readText()) } } catch (_: Exception) {}
             }.apply {
                 isDaemon = true
-                name = "AppPurge-PushOutput"
+                name = "APKDeck-PushOutput"
                 start()
             }
             val deadlineNanos = System.nanoTime() + TimeUnit.SECONDS.toNanos(timeoutSec)

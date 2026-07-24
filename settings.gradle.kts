@@ -1,1 +1,1 @@
-rootProject.name = "AdbUninstaller"
+rootProject.name = "APKDeck"

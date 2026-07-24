@@ -1,28 +1,31 @@
 <idea-plugin>
-    <id>com.lenovo.tools.apppurge</id>
-    <name>AppPurge</name>
-    <vendor>zheng</vendor>
+    <id>dev.apkdeck</id>
+    <name>APK Deck</name>
+    <vendor>APK Deck</vendor>
 
     <description><![CDATA[
     Scans Android application modules in the current project, detects their installation
     status on connected ADB devices, and provides install, uninstall, clear-data, and
     system APK push actions from a dialog. Handles pre-installed system APKs that become
     uninstallable after a debug overlay install.
+    <p><small>Android robot artwork is based on work created and shared by Google and
+    is used under the Creative Commons Attribution 3.0 License.</small></p>
     ]]></description>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>org.jetbrains.android</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <notificationGroup id="AppPurge" displayType="BALLOON" isLogByDefault="true"/>
+        <iconMapper mappingFile="ApkDeckIconMappings.json"/>
+        <notificationGroup id="APK Deck" displayType="BALLOON" isLogByDefault="true"/>
     </extensions>
 
     <actions>
-        <action id="com.lenovo.tools.apppurge.AdbUninstallerAction"
-                class="com.lenovo.tools.apppurge.AdbUninstallerAction"
-                text="AppPurge"
-                description="Manage project APKs on connected ADB devices"
-                icon="/icons/apppurge.svg">
+        <action id="dev.apkdeck.OpenApkDeckAction"
+                class="dev.apkdeck.OpenApkDeckAction"
+                text="APK Deck"
+                description="Manage project applications on connected Android devices"
+                icon="/icons/apkDeck.svg">
             <!-- New UI run toolbar when the IDE exposes the run toolbar action group. -->
             <add-to-group group-id="RunToolbarActionsGroup" anchor="before" relative-to-action="RunToolbarMoreActionGroup"/>
             <add-to-group group-id="RunToolbarMainActionsGroup" anchor="before" relative-to-action="RunToolbarMainMoreActionGroup"/>

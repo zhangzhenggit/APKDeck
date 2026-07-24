@@ -16,12 +16,12 @@ val localProperties = Properties().apply {
     }
 }
 val studioPath = providers.gradleProperty("studioPath")
-    .orElse(providers.environmentVariable("APP_PURGE_STUDIO_PATH"))
+    .orElse(providers.environmentVariable("APK_DECK_STUDIO_PATH"))
     .orElse(provider { localProperties.getProperty("studioPath").orEmpty() })
     .map(String::trim)
     .orNull
     ?.takeIf(String::isNotEmpty)
-    ?: error("Missing studioPath. Set APP_PURGE_STUDIO_PATH or local.properties.")
+    ?: error("Missing studioPath. Set APK_DECK_STUDIO_PATH or local.properties.")
 
 group = pluginGroup
 version = pluginVersion
@@ -58,11 +58,7 @@ intellijPlatform {
 }
 
 tasks {
-    patchPluginXml {
-        sinceBuild = pluginSinceBuild
-    }
-
-    // Delete old zips before every build
+    // Keep the distribution directory limited to the current delivery artifact.
     named("buildPlugin") {
         doFirst {
             fileTree("build/distributions").matching { include("*.zip") }.forEach { it.delete() }

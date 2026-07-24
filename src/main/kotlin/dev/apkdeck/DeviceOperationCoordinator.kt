@@ -1,4 +1,4 @@
-package com.lenovo.tools.apppurge
+package dev.apkdeck
 
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
@@ -54,7 +54,7 @@ object DeviceOperationCoordinator {
             TimeUnit.SECONDS,
             LinkedBlockingQueue(),
             ThreadFactory { runnable ->
-                Thread(runnable, "AppPurge-$serial-Mutation-${mutationThreadNumber.incrementAndGet()}").apply {
+                Thread(runnable, "APKDeck-$serial-Mutation-${mutationThreadNumber.incrementAndGet()}").apply {
                     isDaemon = true
                 }
             },
@@ -76,7 +76,7 @@ object DeviceOperationCoordinator {
         TimeUnit.SECONDS,
         SynchronousQueue(),
         ThreadFactory { runnable ->
-            Thread(runnable, "AppPurge-SystemPush-${pushThreadNumber.incrementAndGet()}").apply {
+            Thread(runnable, "APKDeck-SystemPush-${pushThreadNumber.incrementAndGet()}").apply {
                 isDaemon = true
             }
         },

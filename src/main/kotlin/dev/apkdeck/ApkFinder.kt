@@ -1,4 +1,4 @@
-package com.lenovo.tools.apppurge
+package dev.apkdeck
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.module.Module

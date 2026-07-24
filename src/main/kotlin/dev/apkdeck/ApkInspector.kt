@@ -1,4 +1,4 @@
-package com.lenovo.tools.apppurge
+package dev.apkdeck
 
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.CapturingProcessHandler

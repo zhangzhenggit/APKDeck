@@ -1,4 +1,4 @@
-package com.lenovo.tools.apppurge
+package dev.apkdeck
 
 import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
@@ -7,7 +7,9 @@ import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.Messages
 import com.intellij.ui.AnimatedIcon
-import com.intellij.ui.ComboboxWithBrowseButton
+import com.intellij.ui.components.JBCheckBox
+import com.intellij.ui.components.JBLabel
+import com.intellij.ui.components.JBTextField
 import com.intellij.util.ui.JBUI
 import java.awt.BorderLayout
 import java.awt.Color
@@ -21,9 +23,8 @@ import java.util.concurrent.Executors
 import java.util.concurrent.Future
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
-import javax.swing.JCheckBox
 import javax.swing.JComponent
-import javax.swing.JLabel
+import javax.swing.JButton
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
 import javax.swing.JTextField
@@ -35,7 +36,7 @@ import javax.swing.event.DocumentListener
 private const val PUSH_DIALOG_MIN_FIELD_WIDTH = 430
 private const val PUSH_DIALOG_MAX_FIELD_WIDTH = 460
 private const val PUSH_DIALOG_CONTENT_WIDTH = 560
-private const val PUSH_DIALOG_CONTENT_HEIGHT = 220
+private const val PUSH_DIALOG_CONTENT_HEIGHT = 232
 private const val PUSH_DIALOG_FIELD_HEIGHT = 32
 
 internal class PushSystemApkDialog(
@@ -52,11 +53,11 @@ internal class PushSystemApkDialog(
     private val validationClosed = AtomicBoolean(false)
     private val validationGeneration = AtomicInteger(0)
     private val validationExecutor = Executors.newSingleThreadExecutor { runnable ->
-        Thread(runnable, "AppPurge-ApkValidation").apply { isDaemon = true }
+        Thread(runnable, "APKDeck-ApkValidation").apply { isDaemon = true }
     }
     private var validationFuture: Future<*>? = null
     private val validationSpinner = AnimatedIcon.Default()
-    private val packageValidationField = JTextField("Select an APK to validate").apply {
+    private val packageValidationField = JBTextField("Select an APK to validate").apply {
         isEditable = false
         isOpaque = false
         border = JBUI.Borders.emptyRight(12)
@@ -68,13 +69,13 @@ internal class PushSystemApkDialog(
         isRepeats = false
     }
     private val fieldWidth = preferredPushFieldWidth()
-    private val targetField = JTextField(target.targetPath).apply {
+    private val targetField = JBTextField(target.targetPath).apply {
         preferredSize = Dimension(fieldWidth, PUSH_DIALOG_FIELD_HEIGHT)
         caretPosition = 0
     }
     private val removeOverlayAllowed = info.status == InstallStatus.UPDATED_SYSTEM_APP && target.hasDataOverlay
     private val clearDataAllowed = info.isInstalled
-    private val removeOverlayCheck = JCheckBox("Remove /data/app overlay", removeOverlayAllowed).apply {
+    private val removeOverlayCheck = JBCheckBox("Remove /data/app overlay", removeOverlayAllowed).apply {
         isEnabled = removeOverlayAllowed
         toolTipText = if (removeOverlayAllowed) {
             "Remove the user-installed update so the pushed system APK can take effect after reboot"
@@ -82,7 +83,7 @@ internal class PushSystemApkDialog(
             "No updated-system-app overlay detected for this package"
         }
     }
-    private val clearDataCheck = JCheckBox("Clear app data", clearDataAllowed).apply {
+    private val clearDataCheck = JBCheckBox("Clear app data", clearDataAllowed).apply {
         isEnabled = clearDataAllowed
         toolTipText = if (clearDataAllowed) {
             "Clear current installed app data after pushing"
@@ -115,7 +116,7 @@ internal class PushSystemApkDialog(
             gbc.gridx = 0
             gbc.weightx = 0.0
             gbc.fill = GridBagConstraints.NONE
-            panel.add(JLabel(text), gbc)
+            panel.add(JBLabel(text), gbc)
         }
 
         fun addField(component: JComponent) {
@@ -128,7 +129,7 @@ internal class PushSystemApkDialog(
         }
 
         addLabel("Package:")
-        addField(JTextField(info.packageName).apply {
+        addField(JBTextField(info.packageName).apply {
             isEditable = false
             preferredSize = Dimension(fieldWidth, PUSH_DIALOG_FIELD_HEIGHT)
         })
@@ -179,15 +180,19 @@ internal class PushSystemApkDialog(
             override fun removeUpdate(e: DocumentEvent) = schedulePackageValidation()
             override fun changedUpdate(e: DocumentEvent) = schedulePackageValidation()
         })
-        return ComboboxWithBrowseButton(apkCombo).apply {
+        return JPanel(BorderLayout(6, 0)).apply {
             preferredSize = Dimension(fieldWidth, PUSH_DIALOG_FIELD_HEIGHT)
-            toolTipText = "Choose APK"
-            addActionListener { chooseLocalApk() }
+            add(apkCombo, BorderLayout.CENTER)
+            add(JButton("…").apply {
+                preferredSize = Dimension(38, PUSH_DIALOG_FIELD_HEIGHT)
+                toolTipText = "Choose APK"
+                addActionListener { chooseLocalApk() }
+            }, BorderLayout.EAST)
         }
     }
 
     private fun preferredPushFieldWidth(): Int {
-        val fontMetrics = JLabel().getFontMetrics(UIManager.getFont("TextField.font") ?: UIManager.getFont("Label.font"))
+        val fontMetrics = JBLabel().getFontMetrics(UIManager.getFont("TextField.font") ?: UIManager.getFont("Label.font"))
         val longest = listOf(
             info.packageName,
             target.targetPath,
@@ -225,8 +230,8 @@ internal class PushSystemApkDialog(
         } else {
             "Target Path: generated default path"
         }
-        return JLabel(text).apply {
-            foreground = UIManager.getColor("Label.foreground")
+        return JBLabel(text).apply {
+            foreground = UIManager.getColor("Label.disabledForeground")
             font = font.deriveFont(font.size - 1f)
             border = JBUI.Borders.empty(0, 2, 4, 0)
             toolTipText = target.detectedPath?.let { "Detected: $it" } ?: "Generated from module name, not detected"
@@ -236,11 +241,11 @@ internal class PushSystemApkDialog(
     override fun doOKAction() {
         val apk = resolveSelectedApk()
         if (apk == null || !apk.isFile) {
-            Messages.showErrorDialog("Choose a valid local APK file.", "AppPurge")
+            Messages.showErrorDialog("Choose a valid local APK file.", "APK Deck")
             return
         }
         if (!targetField.text.trim().endsWith(".apk", ignoreCase = true)) {
-            Messages.showErrorDialog("Device Target must be a full .apk path.", "AppPurge")
+            Messages.showErrorDialog("Device Target must be a full .apk path.", "APK Deck")
             return
         }
         validateSelectedApk(showError = true, closeOnSuccess = true)
@@ -281,7 +286,7 @@ internal class PushSystemApkDialog(
         if (apk == null || !apk.isFile) {
             validationGeneration.incrementAndGet()
             showPackageValidationFailure("Invalid APK file")
-            if (showError) Messages.showErrorDialog("Choose a valid local APK file.", "AppPurge")
+            if (showError) Messages.showErrorDialog("Choose a valid local APK file.", "APK Deck")
             return
         }
 
@@ -319,7 +324,7 @@ internal class PushSystemApkDialog(
                                 Actual:   $actual
                                 APK:      ${apk.absolutePath}
                                 """.trimIndent(),
-                                "AppPurge Package Mismatch",
+                                "APK Deck Package Mismatch",
                             )
                         }
                     }
@@ -333,7 +338,7 @@ internal class PushSystemApkDialog(
                         if (showError) {
                             Messages.showErrorDialog(
                                 "Unable to read the APK package name.\n\nAPK: ${apk.absolutePath}\n\n${result.error.orEmpty()}",
-                                "AppPurge APK Validation Failed",
+                                "APK Deck APK Validation Failed",
                             )
                         }
                     }

@@ -1,4 +1,4 @@
-package com.lenovo.tools.apppurge
+package dev.apkdeck
 
 import com.android.tools.idea.model.AndroidModel
 import com.intellij.openapi.application.ReadAction
@@ -10,7 +10,7 @@ import org.w3c.dom.Document
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
 
-object AppModuleScanner {
+object ApplicationModuleScanner {
 
     fun scan(project: Project): List<AppInstallInfo> {
         if (project.isDisposed) return emptyList()

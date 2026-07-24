@@ -1,4 +1,4 @@
-package com.lenovo.tools.apppurge
+package dev.apkdeck
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
@@ -10,10 +10,10 @@ import com.intellij.openapi.progress.Task
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.IconLoader
 
-class AdbUninstallerAction : AnAction(
-    "AppPurge",
-    "Scan app modules and uninstall APKs from connected device via ADB",
-    IconLoader.getIcon("/icons/apppurge.svg", AdbUninstallerAction::class.java),
+class OpenApkDeckAction : AnAction(
+    "APK Deck",
+    "Inspect and manage project applications on connected Android devices",
+    IconLoader.getIcon("/icons/apkDeck.svg", OpenApkDeckAction::class.java),
 ) {
 
     override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
@@ -26,7 +26,7 @@ class AdbUninstallerAction : AnAction(
         val project = e.project ?: return
         val basePath = project.basePath
 
-        ProgressManager.getInstance().run(object : Task.Modal(project, "AppPurge: Connecting…", false) {
+        ProgressManager.getInstance().run(object : Task.Modal(project, "APK Deck: Connecting…", false) {
             override fun run(indicator: ProgressIndicator) {
                 indicator.text = "Connecting to ADB…"
                 val adb = AdbService.adbPath(basePath)
@@ -36,18 +36,18 @@ class AdbUninstallerAction : AnAction(
                     AdbService.getDeviceName(serial, adb)
                 }
                 indicator.text = "Scanning Android application modules…"
-                val projectApps = AppModuleScanner.scan(project)
+                val projectApps = ApplicationModuleScanner.scan(project)
 
                 ApplicationManager.getApplication().invokeLater {
                     if (serials.isEmpty()) {
                         Messages.showInfoMessage(
                             project,
                             "No ADB device connected.",
-                            "AppPurge",
+                            "APK Deck",
                         )
                         return@invokeLater
                     }
-                    UninstallDialog(project, projectApps, deviceNames, basePath).show()
+                    ApkDeckDialog(project, projectApps, deviceNames, basePath).show()
                 }
             }
         })
