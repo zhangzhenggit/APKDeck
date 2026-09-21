@@ -1,0 +1,10 @@
+{
+  "name": "APK Deck",
+  "tagline": "在 IDE 内完成设备端应用管理：重装、清数据、卸载、推送系统 APK。",
+  "icon": "box",
+  "color": "#f59e0b",
+  "install": [
+    "下载插件 ZIP",
+    "Settings → Plugins → ⚙ → Install Plugin from Disk"
+  ]
+}
