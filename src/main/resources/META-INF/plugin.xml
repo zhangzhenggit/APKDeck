@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>dev.apkdeck</id>
     <name>APK Deck</name>
-    <vendor>APK Deck</vendor>
+    <vendor url="https://zhengnest.com">APK Deck</vendor>
 
     <description><![CDATA[
     Scans Android application modules in the current project, detects their installation
